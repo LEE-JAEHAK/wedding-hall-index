@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>웨딩북·아이웨딩 웨딩홀 비교 · 강남·영등포·여의도</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="compare.css">
+  <script src="weddingbook_data.js"></script>
+  <script src="iwedding_data.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">WEDDING VENUE INDEX</div>
+      <h1>강남 · 영등포 · 여의도<br>웨딩홀 한눈에 보기</h1>
+      <p>웨딩북과 아이웨딩의 공개 정보를 2026년 10월 13일 확인해 홀 단위로 대조했습니다.</p>
+      <div class="stats">
+        <span><strong id="venue-count">0</strong> 웨딩홀</span>
+        <span><strong id="overlap-count">0</strong>곳 양쪽 수록</span>
+        <span><strong id="room-count">0</strong> 홀별 정보 행</span>
+        <span><strong id="result-count">0</strong> 검색된 웨딩홀</span>
+        <span><strong id="matching-room-count">0</strong> 조건에 맞는 홀</span>
+      </div>
+    </header>
+
+    <section class="filters" aria-label="검색 및 필터">
+      <div class="filter-grid">
+        <label class="wide">이름·주소·교통·시설 검색
+          <input id="query" type="search" placeholder="예: 여의도, 선릉역, 폐백실, 무료 주차">
+        </label>
+        <label>지역
+          <select id="area">
+            <option value="">전체</option>
+            <option value="강남구">강남구</option>
+            <option value="영등포구">영등포구 전체</option>
+            <option value="여의도동">여의도동만</option>
+            <option value="영등포구-여의도외">영등포구 · 여의도 외</option>
+          </select>
+        </label>
+        <label>출처
+          <select id="source">
+            <option value="">전체</option>
+            <option value="both">두 사이트 모두</option>
+            <option value="wb">웨딩북 수록</option>
+            <option value="iw">아이웨딩 수록</option>
+          </select>
+        </label>
+        <label>식사 형태
+          <select id="meal-type"><option value="">전체</option></select>
+        </label>
+        <label>대관료 상한 (만원)
+          <input id="max-rental" type="number" min="0" step="50" placeholder="예: 1000">
+        </label>
+        <label>1인 식대 상한 (원)
+          <input id="max-meal" type="number" min="0" step="1000" placeholder="예: 100000">
+        </label>
+        <label>추천인원 최소 (웨딩북)
+          <input id="min-recommended" type="number" min="0" step="10" placeholder="예: 150">
+        </label>
+        <label>추천인원 최대 (웨딩북)
+          <input id="max-recommended" type="number" min="0" step="10" placeholder="예: 250">
+        </label>
+        <label>내 하객 수 (아이웨딩 최소~최대)
+          <input id="guest-target" type="number" min="1" step="10" placeholder="예: 180">
+        </label>
+        <label>최소 인원 하한 (아이웨딩)
+          <input id="min-guarantee" type="number" min="0" step="10" placeholder="예: 150">
+        </label>
+        <label>최소 인원 상한 (아이웨딩)
+          <input id="max-guarantee" type="number" min="0" step="10" placeholder="예: 250">
+        </label>
+        <label>착석 인원 하한 (아이웨딩)
+          <input id="min-seated" type="number" min="0" step="10" placeholder="예: 150">
+        </label>
+        <label>착석 인원 상한 (아이웨딩)
+          <input id="max-seated" type="number" min="0" step="10" placeholder="예: 250">
+        </label>
+        <label>최대 수용인원 하한 (아이웨딩)
+          <input id="min-capacity" type="number" min="0" step="10" placeholder="예: 300">
+        </label>
+        <label>최대 수용인원 상한 (아이웨딩)
+          <input id="max-capacity" type="number" min="0" step="10" placeholder="예: 500">
+        </label>
+        <label>내부 주차 최소 (대)
+          <input id="min-parking" type="number" min="0" step="10" placeholder="예: 100">
+        </label>
+      </div>
+      <div class="filter-actions">
+        <button id="reset" type="button" class="button secondary">필터 초기화</button>
+        <button id="export" type="button" class="button primary">현재 결과 CSV 다운로드</button>
+      </div>
+    </section>
+
+    <div class="note"><strong>사용법:</strong> 각 홀이 검색 결과에 개별 행으로 나옵니다. 예식장 이름 아래 홀 이름을 확인하세요. 두 사이트가 함께 제공하는 홀 이름·대관료·식대·예식 간격·꽃장식·식사 형태·주소·주차 대수가 모두 같으면 한 행으로, 하나라도 다르면 출처별 행으로 보여줍니다. 아이웨딩의 최소·착석·최대 인원은 웨딩북 추천인원과 다른 항목입니다. 열 제목을 누르면 홀별로 정렬됩니다.</div>
+
+    <section class="results" aria-label="웨딩홀 결과">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th data-sort="name" tabindex="0">지역 / 웨딩홀 / 홀 ↕</th><th>출처</th><th data-sort="recommended" tabindex="0">추천인원<br>웨딩북 ↕</th><th data-sort="guarantee" tabindex="0">최소 인원<br>아이웨딩 ↕</th><th data-sort="seated" tabindex="0">착석<br>아이웨딩 ↕</th><th data-sort="capacity" tabindex="0">최대 수용<br>아이웨딩 ↕</th><th data-sort="meal" tabindex="0">1인 식대 ↕</th><th data-sort="parking" tabindex="0">주차 ↕</th><th>원본</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p id="empty" class="empty" hidden>조건에 맞는 홀 정보가 없습니다.</p>
+    </section>
+
+    <footer>
+      <p>출처: <a href="https://www.weddingbook.com/weddinghall/search" target="_blank" rel="noopener noreferrer">웨딩북</a> · <a href="https://www.iwedding.co.kr/brand/ihall" target="_blank" rel="noopener noreferrer">아이웨딩</a> 및 각 상세 페이지. 조사일: 2026-10-13.</p>
+      <p>검색 결과는 홀별로 표시합니다. 원본 링크를 누르면 각 사이트의 상세 페이지로 이동합니다.</p>
+    </footer>
+  </main>
+</body>
+</html>

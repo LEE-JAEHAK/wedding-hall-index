@@ -1,0 +1,45 @@
+.page{max-width:none;width:100%;padding-inline:clamp(16px,2.5vw,48px)}
+.results table{width:100%;min-width:1080px;table-layout:fixed}
+.results th,.results tbody td{min-width:0;overflow-wrap:anywhere}
+.results th:first-child{width:20%}
+.results th:nth-child(2){width:10%}
+.results th:nth-child(3),.results th:nth-child(4),.results th:nth-child(5),.results th:nth-child(6){width:9%}
+.results th:nth-child(7){width:15%}
+.results th:nth-child(8){width:9%}
+.results th:nth-child(9){width:10%}
+.results tbody tr:not(.details-row)>td:nth-child(9) .button{white-space:nowrap}
+.source-w,.source-i{display:block;white-space:pre-wrap}
+.source-w{color:#7c3e30}
+.source-i{color:#255d65}
+.same{display:block;color:#667764;font-size:10px;font-weight:600}
+.links{line-height:1.8;min-width:100px}
+.links a{color:#9f4838;text-decoration:none}
+.links a:hover{text-decoration:underline}
+.detail-item span{white-space:pre-wrap}
+th[data-sort]{cursor:pointer;user-select:none}
+th[data-sort]:hover,th[data-sort]:focus{background:#e6d8cf;outline:2px solid #a76a53;outline-offset:-2px}
+th[aria-sort="ascending"],th[aria-sort="descending"]{color:#873d2f;background:#e9dcd4}
+th[aria-sort="ascending"]::after{content:" ▲"}
+th[aria-sort="descending"]::after{content:" ▼"}
+.room-name{margin-top:3px;font-size:13px;font-weight:700;color:#8e4939}
+.source-badge{display:inline-block;padding:5px 8px;border-radius:999px;background:#e8dcd3;color:#62473a;font-size:11px;font-weight:700}
+.difference-label{color:#9e4b3b;font-size:11px;font-weight:700;margin-top:5px;line-height:1.35}
+.hall-row:nth-child(even){background:#fcfaf8}
+@media(max-width:850px){
+  .results .table-scroll{overflow:visible}
+  .results table,.results tbody{display:block;min-width:0;width:100%}
+  .results thead{display:none}
+  .results tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:12px;border:1px solid #e8e2dc;border-radius:12px;overflow:hidden}
+  .results tbody tr>td{display:block;width:auto;padding:9px 12px;border-top:1px solid #eee8e3}
+  .results tbody tr>td:first-child,.results tbody tr>td:last-child{grid-column:1/-1}
+  .results tbody tr>td:first-child{border-top:0}
+  .results tbody tr>td:not(:first-child)::before{display:block;font-size:10px;color:#8d7b70;font-weight:700;margin-bottom:3px}
+  .results tbody tr>td:nth-child(2)::before{content:"출처"}
+  .results tbody tr>td:nth-child(3)::before{content:"추천인원 · 웨딩북"}
+  .results tbody tr>td:nth-child(4)::before{content:"최소 인원 · 아이웨딩"}
+  .results tbody tr>td:nth-child(5)::before{content:"착석 · 아이웨딩"}
+  .results tbody tr>td:nth-child(6)::before{content:"최대 수용 · 아이웨딩"}
+  .results tbody tr>td:nth-child(7)::before{content:"1인 식대"}
+  .results tbody tr>td:nth-child(8)::before{content:"주차"}
+  .results tbody tr>td:nth-child(9)::before{content:"원본"}
+}
