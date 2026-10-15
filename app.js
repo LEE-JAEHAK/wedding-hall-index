@@ -43,6 +43,19 @@
   $('venue-count').textContent=venues.length;$('room-count').textContent=rows.length;$('overlap-count').textContent=venues.filter(v=>v.w&&v.i).length;
   for(const t of [...new Set(rows.flatMap(r=>[r.wr?.['식사형태'],food(r.ir)].filter(Boolean)))].sort((a,b)=>a.localeCompare(b,'ko'))){const o=document.createElement('option');o.value=o.textContent=t;$('meal-type').append(o)}
   let visible=[],csvGroups=[],sortKey='name';
+  const storageKey='wedding-hall-index:filters:v1';
+  function saveFilters(){
+    try{localStorage.setItem(storageKey,JSON.stringify({filters:Object.fromEntries(ids.map(id=>[id,$(id).value])),sortKey}))}catch{}
+  }
+  function restoreFilters(){
+    try{
+      const saved=JSON.parse(localStorage.getItem(storageKey));
+      for(const id of ids){const input=$(id),value=saved?.filters?.[id];
+        if(typeof value==='string'&&(input.tagName!=='SELECT'||[...input.options].some(option=>option.value===value)))input.value=value}
+      const key=saved?.sortKey;
+      if(typeof key==='string'&&[...document.querySelectorAll('th[data-sort]')].some(th=>key===th.dataset.sort||key===th.dataset.sort+'-desc'))sortKey=key;
+    }catch{}
+  }
   function matches(r){const q=norm($('query').value);if(q&&!norm([rowName(r),r.i?.name,r.w?.address,addr(r.i),r.w?.subway,r.w?.amenities,r.i?.intro,r.wr?.name,r.ir?.heading].join(' ')).includes(q))return false;
     const a=$('area').value,rg=region(r),d=dong(r);if(a==='강남구'&&rg!=='서울 강남구'||a==='영등포구'&&rg!=='서울 영등포구'||a==='여의도동'&&d!=='여의도동'||a==='영등포구-여의도외'&&(rg!=='서울 영등포구'||d==='여의도동'))return false;
     const s=$('source').value;if(s==='both'&&!(r.paired||r.w&&r.i)||s==='wb'&&!r.w||s==='iw'&&!r.i)return false;
@@ -90,14 +103,15 @@
   function render(){visible=displayRows.filter(({r})=>matches(r)).sort(sortRooms);csvGroups=groupRows(rows.filter(matches));$('result-count').textContent=new Set(visible.map(({r})=>venueKey(r))).size;$('matching-room-count').textContent=visible.length;$('empty').hidden=visible.length>0;
     for(const th of document.querySelectorAll('th[data-sort]')){const key=th.dataset.sort;th.setAttribute('aria-sort',sortKey===key?'ascending':sortKey===key+'-desc'?'descending':'none')}
     $('rows').innerHTML=visible.map(hallRecordHtml).join('')}
-  for(const id of ids)$(id).addEventListener(id==='query'||id==='guest-target'||id.startsWith('min-')||id.startsWith('max-')?'input':'change',render);
-  const sortFromHeader=th=>{const key=th.dataset.sort;sortKey=sortKey===key?key+'-desc':key;render()};
+  for(const id of ids)$(id).addEventListener(id==='query'||id==='guest-target'||id.startsWith('min-')||id.startsWith('max-')?'input':'change',()=>{saveFilters();render()});
+  const sortFromHeader=th=>{const key=th.dataset.sort;sortKey=sortKey===key?key+'-desc':key;saveFilters();render()};
   document.querySelector('thead').addEventListener('click',e=>{const th=e.target.closest('th[data-sort]');if(th)sortFromHeader(th)});
   document.querySelector('thead').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('th[data-sort]')){e.preventDefault();sortFromHeader(e.target)}});
-  $('reset').addEventListener('click',()=>{for(const id of ids)$(id).value='';sortKey='name';render()});
+  $('reset').addEventListener('click',()=>{for(const id of ids)$(id).value='';sortKey='name';saveFilters();render()});
   $('export').addEventListener('click',()=>{const h=['웨딩홀','지역','동','웨딩북 홀','아이웨딩 홀','웨딩북 추천인원','아이웨딩 최소','아이웨딩 착석','아이웨딩 최대','아이웨딩 장소 보증·수용','웨딩북 대관료','아이웨딩 대관료','웨딩북 식대','아이웨딩 식대','웨딩북 간격','아이웨딩 간격','아이웨딩 예식형태','웨딩북 꽃장식','아이웨딩 꽃장식','아이웨딩 연출료','아이웨딩 음주류','웨딩북 식사형태','아이웨딩 식사형태','아이웨딩 홀유형','아이웨딩 층','웨딩북 주소','아이웨딩 주소','웨딩북 주차','아이웨딩 주차','웨딩북 지하철','웨딩북 부대시설','웨딩북 운영시간','웨딩북 목록 대관료','웨딩북 목록 식대','웨딩북 총 정가','웨딩북 혜택','웨딩북 할인','웨딩북 혜택·상담 기간','아이웨딩 장소 식대 범위','아이웨딩 장소 유형','아이웨딩 가능 행사','아이웨딩 후기 평점/10','아이웨딩 후기 수','아이웨딩 소개·핵심 정보','웨딩북 URL','아이웨딩 URL'];
     const lines=csvGroups.map(g=>{const {w,i}=g,review=i?.intro?.match(/([\d.]+)\/10\s*\(\s*(\d+)개의 후기/),pack=fn=>g.all.map(r=>{const value=fn(r);return value===null||value===undefined||value===''?'':(r.wr?.name||hall(r.ir)||'홀 정보')+': '+value}).filter(Boolean).join('\n');
       return[rowName(g),region(g),dong(g),pack(r=>r.wr?.name),pack(r=>hall(r.ir)),pack(r=>r.wr?.['추천인원']),pack(r=>guests(r.ir,'최소')),pack(r=>guests(r.ir,'착석')),pack(r=>guests(r.ir,'최대')),basic(i,'보증 인원'),pack(r=>r.wr?.['대관료']),pack(r=>rental(r.ir)),pack(r=>r.wr?.['식대']),pack(r=>meal(r.ir)),pack(r=>r.wr?.['예식간격']),pack(r=>interval(r.ir)),pack(r=>style(r.ir)),pack(r=>r.wr?.['꽃장식']),pack(r=>flower(r.ir)),pack(r=>production(r.ir)),pack(r=>alcohol(r.ir)),pack(r=>r.wr?.['식사형태']),pack(r=>food(r.ir)),pack(r=>type(r.ir)),pack(r=>floor(r.ir)),w?.address,addr(i),w?.parking,basic(i,'주차 형태'),w?.subway,w?.amenities,w?.hours,w?.list_rental,w?.list_meal,w?.total_regular,w?.badges?.join(', '),w?.discount,w?.promotions,basic(i,'식사 비용'),basic(i,'홀타입'),basic(i,'가능 행사'),review?.[1],review?.[2],i?.intro,w?.url,i?.url]});
     const csv=x=>'"'+String(x??'').replaceAll('"','""')+'"',body='\ufeff'+[h,...lines].map(x=>x.map(csv).join(',')).join('\r\n'),url=URL.createObjectURL(new Blob([body],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='weddingbook_iwedding_2026-10-13.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+  restoreFilters();
   render();
 })();
